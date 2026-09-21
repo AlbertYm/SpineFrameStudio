@@ -1,0 +1,11 @@
+{
+  "checkedOn": "2026-09-21",
+  "powershellSyntax": "passed",
+  "pinnedModuleVersion": "1.0.18",
+  "publicReleaseGate": "blocked as expected before creating output",
+  "localBuild": "passed",
+  "extractedFileHashes": 26,
+  "licenseFilesIncluded": true,
+  "fullGuiRegression": "not rerun",
+  "publicBinaryRedistribution": "not approved by this audit"
+}

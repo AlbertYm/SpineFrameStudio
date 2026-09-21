@@ -14,7 +14,7 @@ EXE、FFmpeg 和 ZIP 不进入 Git 历史，完整可运行 ZIP 作为 GitHub Re
 4. 使用可公开、合成或自己有权使用的小样本验证。不得用上传工作素材的方式复现问题。
 5. `git diff --check`，检查 `git diff` 和 `git diff --cached`，确认没有素材、秘密及无关变更。
 6. 提交信息写清用途，例如 `fix: 修复 GIF 抽帧数量`。推送自己的分支后创建 Pull Request；描述问题、结果、测试环境、已执行测试和未验证范围。
-7. 维护者审查并合并。禁止直接覆盖已发布 tag、强推共享 main、删除历史 Release。贡献代码须有相应权利；项目许可证未确定前不假定已授予开源授权。
+7. 维护者审查并合并。禁止直接覆盖已发布 tag、强推共享 main、删除历史 Release。提交的项目代码与文档须由你拥有或已获授权，并同意按本项目 MIT 许可提供。第三方代码保留原许可和版权声明，不得直接改标 MIT。
 
 ```powershell
 git switch -c fix/example
@@ -29,6 +29,7 @@ git push -u origin fix/example
 ## 发布规则
 
 - `src/version.json` 是单一版本依据，发布新版本时同步 executable、fileVersion、文档与版本号，禁止覆盖已交付 ZIP。
+- 公开发布必须使用 `tools/build.ps1 -ForPublicRelease`；当前第三方材料未闭合时脚本会拒绝，不得通过修改状态字段、移除检查或发布普通本地构建绕过审核。具体缺项见 `compliance/README.md`。
 - 构建脚本使用独立 dist 目录。先检查 PowerShell 语法，再在全新中文和空格目录解压完整 ZIP，校验清单及 EXE 版本、启动、真实短视频和 GIF 抽帧；修改涉及 GUI 时验证相关交互、滚动、长名称、窗口缩放和 DPI。
 - 必须报告开发机验证与目标机验证的区别；历史记录明确注明日期，不将旧测试写成本次已通过。
 - 发布包包含全部运行依赖、最终用户说明、SHA-256 清单，以及适用第三方许可与源码说明。检查依赖许可和对应源码分发要求；不能只附一个项目通用许可证覆盖依赖。

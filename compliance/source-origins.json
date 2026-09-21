@@ -1,0 +1,25 @@
+{
+  "retrievedOn": "2026-09-21",
+  "archives": [
+    {
+      "file": "FFmpeg-63b2b0f47d-source.tar.gz",
+      "origin": "https://api.github.com/repos/FFmpeg/FFmpeg/tarball/63b2b0f47df420007c53888ce0e8383d24b8fb06",
+      "commit": "63b2b0f47df420007c53888ce0e8383d24b8fb06",
+      "bytes": 13754035,
+      "sha256": "06F221FE8D4D7B2A3416F19641A472C0CCE836DF38110BB2C093B7528A7065FC",
+      "tarEntries": 7602,
+      "scope": "FFmpeg upstream main source only; not complete corresponding source for the historical static binary",
+      "distribution": "Included in the compliance ZIP on GitHub Release v2026.9.15"
+    }
+  ],
+  "ps2exe": {
+    "origin": "https://github.com/MScholtes/PS2EXE/tree/9d6cc14363639ccecf4571842ef6cd4518781ae8",
+    "files": [
+      "Module/ps2exe.ps1",
+      "Module/ps2exe.psd1",
+      "Module/ps2exe.psm1",
+      "LICENSE"
+    ]
+  },
+  "msPlReference": "https://github.com/spdx/license-list-data/blob/main/text/MS-PL.txt"
+}

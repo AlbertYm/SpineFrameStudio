@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "auditedOn": "2026-09-21",
+  "projectLicense": "MIT",
+  "redistributionReady": false,
+  "ffmpeg": {
+    "version": "N-102062-g63b2b0f47d-ffmpeg-windows-build-helpers",
+    "binarySha256": "C645BC5CC56BE1FDB46A84B72C292B6EE80008E81C6791AB7B2CBDF23F67C9C6",
+    "reportedLicense": "GPL-3.0-or-later",
+    "sourceCommit": "63b2b0f47df420007c53888ce0e8383d24b8fb06",
+    "correspondingSourceComplete": false,
+    "unresolved": [
+      "Exact build provenance and patches",
+      "Versions and sources of static dependencies",
+      "All dependency notices and build instructions"
+    ]
+  },
+  "ps2exe": {
+    "version": "1.0.18",
+    "sourceCommit": "9d6cc14363639ccecf4571842ef6cd4518781ae8",
+    "coreSha256": "94613E703FA2EC67A01255E5917A056A9406FD31C557685B7AE76417F706A09A",
+    "rootLicense": "Microsoft Limited Public License 1.1",
+    "scriptHeaderLicense": "MS-PL",
+    "licenseDiscrepancyResolved": false,
+    "historicalExeBuildProven": false
+  }
+}

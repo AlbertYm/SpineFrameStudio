@@ -34,7 +34,7 @@ Windows 本地视频 / GIF 抽帧素材工作台，当前发布版本 **2026.9.1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frames.ps1 -Gui
 ```
 
-需要生成 EXE 时，开发机安装 PS2EXE 后运行 `tools/build.ps1`；脚本在独立 `dist/` 中构建，不覆盖历史发布。构建前需要 `src/ffmpeg.exe`。公开发布前还需完成 CONTRIBUTING 中的验收，不应仅凭编译成功发布。
+需要生成 EXE 时，在 Windows PowerShell 5.1 中运行 `tools/build.ps1`；使用归档的 PS2EXE 1.0.18 源码，在独立 `dist/` 中构建，不覆盖历史发布。构建前需要 `src/ffmpeg.exe`。普通构建仅供本地验证；公开发布须运行 `tools/build.ps1 -ForPublicRelease`，当前依赖材料未完整，因此会拒绝公开打包。详见 [许可与来源档案](compliance/README.md)。
 
 ## 验证与限制
 
@@ -46,4 +46,6 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frame
 
 ## 仓库与授权
 
-本仓库公开可见，但当前未为项目自身代码指定开源许可证。公开可见不等于授予任意再分发或商业使用许可；如需使用授权请通过 Issue 联系维护者。第三方组件遵循各自许可证，见 [第三方说明](THIRD_PARTY_NOTICES.md)。本项目不是 Esoteric Software 的官方产品。
+项目自身源码与文档采用 [MIT License](LICENSE)，允许使用、修改、商用和再分发，须保留版权与许可证，无担保。第三方组件、第三方许可原文和归档源码不由 MIT 重新授权，见 [第三方说明](THIRD_PARTY_NOTICES.md)。本项目不是 Esoteric Software 的官方产品。
+
+**历史便携包的 FFmpeg 完整对应源码尚未补齐，PS2EXE 上游许可表述也存在差异。** 本仓库已归档核实材料并阻止未来未经检查的公开打包，但不能将旧二进制包称为已完成许可整改。详见 [材料清单与缺项](compliance/README.md)。

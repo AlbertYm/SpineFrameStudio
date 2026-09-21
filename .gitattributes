@@ -1,1 +1,3 @@
 * -text whitespace=cr-at-eol
+# Preserve upstream license bytes, including its original trailing space.
+licenses/PS2EXE-Ms-LPL-1.1.txt -whitespace

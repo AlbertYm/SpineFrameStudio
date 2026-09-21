@@ -1,0 +1,72 @@
+[
+  {
+    "path": "compliance/dependency-manifest.json",
+    "sha256": "9C4083D5557BEDE940BBC528F1BE0A333A90619D9F36B2168BB6F17F71A9B323",
+    "bytes": 1009
+  },
+  {
+    "path": "compliance/ffmpeg-enabled-options.json",
+    "sha256": "E5D7EEDE50042FB26AF323B7E8201D01AB91B49FD51624647AE4574A3DC3A4D2",
+    "bytes": 1393
+  },
+  {
+    "path": "compliance/ffmpeg-license-output.txt",
+    "sha256": "68AD55ED70EF5C190777267568201986F37A8399D1C3E336895E815AF2016C70",
+    "bytes": 2962
+  },
+  {
+    "path": "compliance/ffmpeg-version.txt",
+    "sha256": "3DE8EC4E1C1828CB5592DC839C69161A649413D01ABEBC1B46A184EDDC565F4E",
+    "bytes": 2334
+  },
+  {
+    "path": "compliance/README.md",
+    "sha256": "44CD43EBE1B5AEFADDED170101EF12276EA6B18BF574DAB3624ECA1B04AED668",
+    "bytes": 3858
+  },
+  {
+    "path": "compliance/source-origins.json",
+    "sha256": "B7415F625F7E133FE672B602CA14543AB8011B667B5BAFBB2566EADCCCCF65D6",
+    "bytes": 977
+  },
+  {
+    "path": "compliance/verification.json",
+    "sha256": "D95AFBBBBB605743CE593D8EF90C52B3FC89DE5FD8D18B95C8DD078F6A76400F",
+    "bytes": 364
+  },
+  {
+    "path": "licenses/FFmpeg-GPL-3.0.txt",
+    "sha256": "8CEB4B9EE5ADEDDE47B31E975C1D90C73AD27B6B165A1DCD80C7C545EB65B903",
+    "bytes": 35147
+  },
+  {
+    "path": "licenses/PS2EXE-Ms-LPL-1.1.txt",
+    "sha256": "31CBB7C4A4EC3D46302BAC50DCC509FD5FC12AEC8FC47325C2739E79C5C8D3F5",
+    "bytes": 3231
+  },
+  {
+    "path": "licenses/PS2EXE-Ms-PL.txt",
+    "sha256": "7A162B1DA10F1C22DB4C68F07BEC4A8355259F8D4AAB5B00A2B2BBD423D833DD",
+    "bytes": 2663
+  },
+  {
+    "path": "third_party/ps2exe/ps2exe.ps1",
+    "sha256": "94613E703FA2EC67A01255E5917A056A9406FD31C557685B7AE76417F706A09A",
+    "bytes": 99051
+  },
+  {
+    "path": "third_party/ps2exe/ps2exe.psd1",
+    "sha256": "385D548833BAB9599AD8F6B936F695A2F107FE172A4F9B411819223563573BA3",
+    "bytes": 6692
+  },
+  {
+    "path": "third_party/ps2exe/ps2exe.psm1",
+    "sha256": "E27DA8205A1281E0089DBB06036EEAA9568D22C4A26EDC0CFF66234EFE9A735B",
+    "bytes": 663
+  },
+  {
+    "path": "third_party/ps2exe/README.md",
+    "sha256": "F78E843E1985772051BBA342B015A6FBB56CF6911B974B29B430334393F3F3BC",
+    "bytes": 915
+  }
+]

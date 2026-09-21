@@ -1,0 +1,14 @@
+*.exe
+*.zip
+*.mp4
+*.mov
+*.gif
+*.png
+*.spine
+*.log
+.env*
+/dist/
+/outputs/
+/_verification/
+/.backups/
+/_backup/

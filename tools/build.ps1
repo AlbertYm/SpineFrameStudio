@@ -15,7 +15,7 @@ $package = Join-Path $root ('dist/SpineFrameStudio_' + $v.version)
 $zip = $package + '.zip'
 if ((Test-Path $package) -or (Test-Path $zip)) { throw 'Output exists. Preserve it and select a new version or a clean checkout.' }
 New-Item -ItemType Directory -Path $package -Force | Out-Null
-foreach ($name in @('extract_frames.ps1','extract_frames_core.ps1','extract_frames_ui.ps1','workbench_worker.ps1','studio_controls.cs','ui_text.json','version.json','ffmpeg.exe','打开抽帧工具.bat','拖拽视频到这里抽帧.bat')) { Copy-Item -LiteralPath (Join-Path $src $name) -Destination $package }
+foreach ($name in @('extract_frames.ps1','extract_frames_core.ps1','extract_frames_ui.ps1','workbench_worker.ps1','spine_project.ps1','studio_controls.cs','ui_text.json','version.json','ffmpeg.exe','打开抽帧工具.bat','拖拽视频到这里抽帧.bat')) { Copy-Item -LiteralPath (Join-Path $src $name) -Destination $package }
 Copy-Item (Join-Path $root 'docs/使用说明.md') (Join-Path $package 'README_先看这里.md')
 Copy-Item (Join-Path $root 'THIRD_PARTY_NOTICES.md') $package
 Copy-Item (Join-Path $root 'LICENSE') $package

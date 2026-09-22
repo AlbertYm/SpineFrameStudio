@@ -597,7 +597,7 @@ function Run-GuiMode {
     $studioSettings.BackColor = $theme.FormBottom
     $form.Controls.Add($studioSettings)
     $studioPages = @()
-    foreach ($i in 0..2) {
+    foreach ($i in 0..3) {
         $page = New-Object System.Windows.Forms.Panel
         $page.AutoScroll = $true
         $page.BackColor = $theme.FormBottom
@@ -605,20 +605,20 @@ function Run-GuiMode {
         $studioPages += $page
     }
     $studioTabs = @()
-    foreach ($i in 0..2) {
-        $tab = Add-Button $studioSettings '' ($i * 154) 0 146 40
+    foreach ($i in 0..3) {
+        $tab = Add-Button $studioSettings '' ($i * 112) 0 108 40
         $tab.Tag = $i
         $tab.Add_KeyDown({param($sender,$e)
             if($e.KeyCode -eq 'Right' -or $e.KeyCode -eq 'Left'){
-                $delta=if($e.KeyCode -eq 'Right'){1}else{2}
-                $next=$studioTabs[(([int]$sender.Tag+$delta)%3)]
+                $delta=if($e.KeyCode -eq 'Right'){1}else{3}
+                $next=$studioTabs[(([int]$sender.Tag+$delta)%4)]
                 $next.Focus();$next.PerformClick();$e.Handled=$true
             }
         })
         $tab.AccessibleRole = [System.Windows.Forms.AccessibleRole]::PageTab
         $tab.Add_Click({
             param($sender,$e)
-            for ($j=0; $j -lt 3; $j++) {
+            for ($j=0; $j -lt 4; $j++) {
                 $selected = ($j -eq [int]$sender.Tag)
                 $studioPages[$j].Visible = $selected
                 $studioTabs[$j].Variant = if ($selected) { 'selected' } else { 'secondary' }
@@ -637,6 +637,35 @@ function Run-GuiMode {
     $studioPages[1].Controls.Add($cardEdge)
     $studioPages[2].Controls.Add($cardAction)
     $studioPages[2].Controls.Add($cardImageResize)
+    $spineCard=Add-Card $studioPages[3] 0 0 450 474
+    $chkCreateSpine=New-Object System.Windows.Forms.CheckBox
+    $chkCreateSpine.Text='抽帧后创建 Spine 动画工程';$chkCreateSpine.Location=[Drawing.Point]::new(20,18);$chkCreateSpine.Size=[Drawing.Size]::new(400,28)
+    $chkCreateSpine.ForeColor=$theme.Text;$chkCreateSpine.BackColor=[Drawing.Color]::Transparent;$spineCard.Controls.Add($chkCreateSpine)
+    $lblSpineAnimation=Add-Label $spineCard '动画名称' 20 62 100
+    $txtSpineAnimation=Add-TextBox $spineCard 130 58 280 'sequence'
+    $lblSpineFps=Add-Label $spineCard '动画 FPS' 20 106 100
+    $txtSpineFps=Add-TextBox $spineCard 130 102 92 '12'
+    $chkSpineLoop=New-Object System.Windows.Forms.CheckBox
+    $chkSpineLoop.Text='循环播放';$chkSpineLoop.Checked=$true;$chkSpineLoop.Location=[Drawing.Point]::new(250,102);$chkSpineLoop.Size=[Drawing.Size]::new(150,28)
+    $chkSpineLoop.ForeColor=$theme.Text;$chkSpineLoop.BackColor=[Drawing.Color]::Transparent;$spineCard.Controls.Add($chkSpineLoop)
+    $lblSpineTemplate=Add-Label $spineCard '模板工程' 20 154 100
+    $txtSpineTemplate=Add-TextBox $spineCard 20 184 300 ''
+    $btnSpineTemplate=Add-Button $spineCard '选择模板' 330 180 100 38
+    $lblSpineSlot=Add-Label $spineCard 'Mask 内目标 Slot（留空自动识别）' 20 234 380
+    $txtSpineSlot=Add-TextBox $spineCard 20 264 410 ''
+    $chkOpenSpine=New-Object System.Windows.Forms.CheckBox
+    $chkOpenSpine.Text='完成后打开生成的 Spine 工程';$chkOpenSpine.Location=[Drawing.Point]::new(20,312);$chkOpenSpine.Size=[Drawing.Size]::new(390,28)
+    $chkOpenSpine.ForeColor=$theme.Text;$chkOpenSpine.BackColor=[Drawing.Color]::Transparent;$spineCard.Controls.Add($chkOpenSpine)
+    $spineHelp=Add-Label $spineCard '不选模板：创建一根 root 骨骼和一个序列 Slot。`n选择模板：复制骨骼、Skin、Clipping/Mask、Draw Order 和已有动画，再把新序列加入目标 Slot。`n原模板不会被覆盖。' 20 358 410
+    $spineHelp.Text=$spineHelp.Text.Replace('`n',[Environment]::NewLine);$spineHelp.Height=94;$spineHelp.ForeColor=$theme.Muted
+    $spineDialog=New-Object System.Windows.Forms.OpenFileDialog
+    $spineDialog.Filter='Spine 模板|*.spine;*.json|Spine 工程|*.spine|Skeleton JSON|*.json'
+    $btnSpineTemplate.Add_Click({if($spineDialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK){$txtSpineTemplate.Text=$spineDialog.FileName}})
+    $updateSpineFields={
+        $enabled=$chkCreateSpine.Checked
+        foreach($control in @($txtSpineAnimation,$txtSpineFps,$chkSpineLoop,$txtSpineTemplate,$btnSpineTemplate,$txtSpineSlot,$chkOpenSpine)){$control.Enabled=$enabled}
+    }
+    $chkCreateSpine.Add_CheckedChanged($updateSpineFields);& $updateSpineFields
     Place-StudioControl $cardInput 0 0 450 246
     Place-StudioControl $lblVideo 20 18 300 24
     Place-StudioControl $txtVideo 20 50 410 86
@@ -731,8 +760,8 @@ function Run-GuiMode {
     }
     $studioLanguage={
         $cn=$script:CurrentLanguage -eq 'zh-CN'
-        $names=if($cn){@('素材与抽帧','抠图与清边','导出设置')}else{@('Source','Cutout','Export')}
-        for($i=0;$i -lt 3;$i++){$studioTabs[$i].Text=$names[$i]}
+        $names=if($cn){@('素材与抽帧','抠图与清边','导出设置','Spine 动画')}else{@('Source','Cutout','Export','Spine')}
+        for($i=0;$i -lt 4;$i++){$studioTabs[$i].Text=$names[$i]}
         $studioPreviewTitle.Text=if($cn){'画面对照'}else{'Preview comparison'}
         if($studioProgress.Value -eq 0 -and !$script:StudioBusy){$studioStatus.Text=if($cn){'就绪 · 选择素材后开始'}else{'Ready · Choose source files to begin'}}
         $studioImportHint.Text=if($cn){'支持拖入多个视频 / GIF。每次导出新建文件夹，保留原始素材。描边设置位于「导出设置」。'}else{'Drop video or GIF files into the input. Exports use new folders. Outline settings are under Export.'}
@@ -924,10 +953,11 @@ function Run-GuiMode {
     & $updateSamplingFields
     $workbenchLanguage={
         $cn=$script:CurrentLanguage -eq 'zh-CN'
-        $form.Text='Spine Frame Studio 2026.9.15';$title.Text='Spine Frame Studio'
+        $form.Text='Spine Frame Studio 2026.9.22';$title.Text='Spine Frame Studio'
         $studioTabs[0].Text=if($cn){'抽帧'}else{'Frames'}
         $studioTabs[1].Text=if($cn){'透明与边缘'}else{'Cutout'}
-        $studioTabs[2].Text=if($cn){'导出与工具'}else{'Export'}
+        $studioTabs[2].Text=if($cn){'导出工具'}else{'Export'}
+        $studioTabs[3].Text=if($cn){'Spine 动画'}else{'Spine'}
         $btnVideo.Text=if($cn){'添加素材'}else{'Add files'}
         $btnClear.Text=if($cn){'清空'}else{'Clear'}
         $btnRemove.Text=if($cn){'移除选中'}else{'Remove'}
@@ -942,6 +972,14 @@ function Run-GuiMode {
         $viewCompare.Text=if($cn){'并排对照'}else{'Compare'}
         $btnZoomReset.Text=if($cn){'适合画布'}else{'Fit canvas'}
         $sourceEmpty.Text=if($cn){'拖入视频 / GIF，或点击「添加素材」'}else{'Drop videos / GIFs here, or choose Add files'}
+        $chkCreateSpine.Text=if($cn){'抽帧后创建 Spine 动画工程'}else{'Create a Spine animation after export'}
+        $lblSpineAnimation.Text=if($cn){'动画名称'}else{'Animation name'}
+        $lblSpineFps.Text=if($cn){'动画 FPS'}else{'Animation FPS'}
+        $chkSpineLoop.Text=if($cn){'循环播放'}else{'Loop'}
+        $lblSpineTemplate.Text=if($cn){'模板工程'}else{'Template project'}
+        $btnSpineTemplate.Text=if($cn){'选择模板'}else{'Browse'}
+        $lblSpineSlot.Text=if($cn){'Mask 内目标 Slot（留空自动识别）'}else{'Target slot inside mask (blank = auto)'}
+        $chkOpenSpine.Text=if($cn){'完成后打开生成的 Spine 工程'}else{'Open generated Spine project'}
         $extractHelp.Text=if($cn){"按张数：在整段素材中均匀选帧。`n按 FPS：保持原时长，改变采样频率。`n`n画布尺寸留空时保持原始尺寸；`n指定尺寸时等比缩放，透明补边。"}else{"Frame count: evenly sample the whole clip.`nFPS: sample at a chosen rate.`n`nLeave canvas size blank for original size.`nA specified size fits with transparent padding."}
         $workflowHelp.Text=if($cn){'先更新预览，再检查透明边缘，最后导出。'}else{'Update preview, inspect edges, then export.'}
     }
@@ -961,7 +999,7 @@ function Run-GuiMode {
         $sourceList.Columns[0].Width=U ($left-210);$sourceList.Columns[1].Width=U 66;$sourceList.Columns[2].Width=U 96
         B $studioSettings ($w-478) 56 462 ($h-194)
         B $inspectorTitle 12 12 430 26
-        foreach($i in 0..2){B $studioTabs[$i] ($i*151) 48 145 36; B $studioPages[$i] 0 96 462 ($h-290)}
+        foreach($i in 0..3){B $studioTabs[$i] ($i*113) 48 108 36; B $studioPages[$i] 0 96 462 ($h-290)}
         B $cardPreview 16 202 $left ($h-340)
         $pw=$left;$ph=$h-340
         B $canvasName 16 12 ($pw-32) 25
@@ -1019,6 +1057,11 @@ function Run-GuiMode {
                 if([string]::IsNullOrWhiteSpace($txtOutput.Text)){throw '请选择输出目录。'}
                 if($rbCount.Checked){[void](Get-WorkbenchInteger $txtFrameCount '抽帧张数' 1 100000)}
                 if($rbFps.Checked -and $txtFps.Text.Trim()){$fpsCheck=0.0;if(![double]::TryParse($txtFps.Text.Trim(),[ref]$fpsCheck) -or $fpsCheck -le 0){throw 'FPS 请输入正数，或留空保持原帧率。'}}
+                if($chkCreateSpine.Checked){
+                    if([string]::IsNullOrWhiteSpace($txtSpineAnimation.Text)){throw '请填写 Spine 动画名称。'}
+                    $spineFpsCheck=0.0;if(![double]::TryParse($txtSpineFps.Text.Trim(),[ref]$spineFpsCheck) -or $spineFpsCheck -le 0 -or $spineFpsCheck -gt 240){throw 'Spine 动画 FPS 请输入 0–240 之间的正数。'}
+                    if($txtSpineTemplate.Text.Trim() -and !(Test-Path -LiteralPath $txtSpineTemplate.Text.Trim() -PathType Leaf)){throw 'Spine 模板文件不存在。'}
+                }
             }
             $size=Parse-TargetSize -Text $txtTargetSize.Text.Trim()
             foreach($entry in @(@($txtTolerance,'颜色容差',0,255),@($txtSoftness,'柔化范围',0,255),@($txtDespill,'去色溢强度',0,100),@($txtChoke,'收边像素',0,100),@($txtMinAlpha,'最低透明度',0,255))){[void](Get-WorkbenchInteger $entry[0] $entry[1] $entry[2] $entry[3])}
@@ -1035,7 +1078,8 @@ function Run-GuiMode {
             }
             $jobDirectory=Join-Path $env:TEMP ('SpineWorkbench_'+[guid]::NewGuid().ToString('N'))
             [void](New-Item -ItemType Directory -Path $jobDirectory)
-            $config=@{operation=$operation;videos=$videos;arguments=$arguments;outline=$outline;removeBackground=$chkRemoveBg.Checked}
+            $spineOptions=@{Enabled=($operation -eq 'extract' -and $chkCreateSpine.Checked);AnimationName=$txtSpineAnimation.Text.Trim();Fps=$txtSpineFps.Text.Trim();Loop=$chkSpineLoop.Checked;TemplatePath=$txtSpineTemplate.Text.Trim();TargetSlot=$txtSpineSlot.Text.Trim();OpenAfter=$chkOpenSpine.Checked;Version='4.1.24'}
+            $config=@{operation=$operation;videos=$videos;arguments=$arguments;outline=$outline;removeBackground=$chkRemoveBg.Checked;spine=$spineOptions}
             [IO.File]::WriteAllText((Join-Path $jobDirectory 'config.json'),($config|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
             $worker=Join-Path $Script:ToolDir 'workbench_worker.ps1'
             $process=Start-Process -FilePath (Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe') -ArgumentList @('-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-STA','-File',('"'+$worker+'"'),'-JobDirectory',('"'+$jobDirectory+'"')) -WindowStyle Hidden -PassThru -RedirectStandardError (Join-Path $jobDirectory 'stderr.log')
@@ -1077,7 +1121,11 @@ function Run-GuiMode {
                             $studioStatus.Text="预览已更新 · ${elapsed}s"
                         }else{
                             $script:LastExport=@($state.outputs)[-1]
-                            $studioStatus.Text="导出完成 · $($state.completed) 个文件 · ${elapsed}s · 点击「打开输出」查看"
+                            if(@($state.spineProjects).Count -gt 0){
+                                $script:LastExport=Split-Path -Parent ([string]@($state.spineProjects)[-1])
+                                $studioStatus.Text="导出和 Spine 工程创建完成 · $($state.completed) 个文件 · ${elapsed}s"
+                                if($state.openSpine -and @($state.spineProjects).Count -eq 1){Start-Process -FilePath ([string]@($state.spineProjects)[0])}
+                            }else{$studioStatus.Text="导出完成 · $($state.completed) 个文件 · ${elapsed}s · 点击「打开输出」查看"}
                         }
                         $studioStatus.ForeColor=[Drawing.ColorTranslator]::FromHtml('#A9D5B6')
                     }elseif($state.state -eq 'stopped'){
@@ -1118,7 +1166,7 @@ function Run-GuiMode {
         if ($null -ne $picCutout.Image) { $oldCutout = $picCutout.Image; $picCutout.Image = $null; $oldCutout.Dispose() }
     })
     if ($env:SPINE_STUDIO_VERIFY -eq '1') {
-        $script:StudioTestContext = @{ Form=$form; Video=$txtVideo; Output=$txtOutput; Start=$btnStart; Preview=$btnPreview; Original=$picOriginal; Cutout=$picCutout; Tabs=$studioTabs; Pages=$studioPages; Status=$studioStatus; Count=$rbCount; FrameCount=$txtFrameCount; RemoveBg=$chkRemoveBg; Language=$cmbLanguage; Log=$txtLog; ZoomIn=$btnZoomIn; ZoomOut=$btnZoomOut; ZoomReset=$btnZoomReset }
+        $script:StudioTestContext = @{ Form=$form; Video=$txtVideo; Output=$txtOutput; Start=$btnStart; Preview=$btnPreview; Original=$picOriginal; Cutout=$picCutout; Tabs=$studioTabs; Pages=$studioPages; Status=$studioStatus; Count=$rbCount; FrameCount=$txtFrameCount; RemoveBg=$chkRemoveBg; Language=$cmbLanguage; Log=$txtLog; ZoomIn=$btnZoomIn; ZoomOut=$btnZoomOut; ZoomReset=$btnZoomReset; CreateSpine=$chkCreateSpine; SpineTemplate=$txtSpineTemplate; SpineSlot=$txtSpineSlot; SpineAnimation=$txtSpineAnimation; SpineFps=$txtSpineFps }
         if ($env:SPINE_STUDIO_VERIFY_SCRIPT) { . $env:SPINE_STUDIO_VERIFY_SCRIPT }
         return $null
     }

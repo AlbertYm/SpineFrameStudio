@@ -64,6 +64,15 @@ function Add-Card {
     return $panel
 }
 
+function Read-SharedUtf8Text {
+    param([Parameter(Mandatory=$true)][string]$Path)
+    $stream=[IO.FileStream]::new($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+    try {
+        $reader=[IO.StreamReader]::new($stream,[Text.Encoding]::UTF8,$true)
+        try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+    } finally { $stream.Dispose() }
+}
+
 function Add-DroppedVideosToTextBox {
     param($TextBox, [string[]]$Paths)
     if($script:StudioBusy){return}
@@ -953,7 +962,7 @@ function Run-GuiMode {
     & $updateSamplingFields
     $workbenchLanguage={
         $cn=$script:CurrentLanguage -eq 'zh-CN'
-        $form.Text='Spine Frame Studio 2026.9.22';$title.Text='Spine Frame Studio'
+        $form.Text='Spine Frame Studio 2026.9.23';$title.Text='Spine Frame Studio'
         $studioTabs[0].Text=if($cn){'抽帧'}else{'Frames'}
         $studioTabs[1].Text=if($cn){'透明与边缘'}else{'Cutout'}
         $studioTabs[2].Text=if($cn){'导出工具'}else{'Export'}
@@ -1102,7 +1111,7 @@ function Run-GuiMode {
         try {
             $job=$script:WorkbenchJob;$statusFile=Join-Path $job.Directory 'status.json'
             if(Test-Path -LiteralPath $statusFile){
-                try {$state=Get-Content -LiteralPath $statusFile -Raw -Encoding UTF8|ConvertFrom-Json;$job.LastState=$state}catch{return}
+                try {$state=(Read-SharedUtf8Text -Path $statusFile)|ConvertFrom-Json;$job.LastState=$state}catch{return}
                 $elapsed=[int]((Get-Date)-$job.Started).TotalSeconds
                 $studioProgress.Maximum=[Math]::Max(1,[int]$state.total);$studioProgress.Value=[int]$state.completed
                 $studioStatus.Text="$($state.phase) · $($state.completed)/$($state.total) 个文件 · ${elapsed}s · $($state.current)"

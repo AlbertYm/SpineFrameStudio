@@ -110,20 +110,40 @@ function New-BasicSpineData {
 function Find-ClippedTargetSlot {
     param($Data)
     $slotNames = @($Data.slots | ForEach-Object { [string]$_.name })
+    $clippingSlots = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $imageSlots = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    $clipStarts = New-Object 'System.Collections.Generic.List[int]'
     foreach ($skin in @($Data.skins)) {
         if ($null -eq $skin.attachments) { continue }
         foreach ($slotProperty in $skin.attachments.PSObject.Properties) {
             foreach ($attachmentProperty in $slotProperty.Value.PSObject.Properties) {
                 $attachment = $attachmentProperty.Value
-                if ([string]$attachment.type -ne 'clipping') { continue }
+                $type = [string]$attachment.type
+                if ([string]::IsNullOrWhiteSpace($type) -or $type -in @('region','mesh','linkedmesh')) { [void]$imageSlots.Add([string]$slotProperty.Name) }
+                if ($type -ne 'clipping') { continue }
+                [void]$clippingSlots.Add([string]$slotProperty.Name)
                 $startIndex = [Array]::IndexOf($slotNames, [string]$slotProperty.Name)
+                if($startIndex -ge 0){$clipStarts.Add($startIndex)}
                 $endIndex = if ($attachment.end) { [Array]::IndexOf($slotNames, [string]$attachment.end) } else { $slotNames.Count }
-                if ($startIndex -ge 0) {
+                # A usable explicit range must extend past the clipping slot. Some
+                # production templates export end=start; fall back below in that case.
+                if ($startIndex -ge 0 -and ($endIndex -lt 0 -or $endIndex -gt $startIndex)) {
                     for ($i=$startIndex+1; $i -lt $slotNames.Count -and ($endIndex -lt 0 -or $i -le $endIndex); $i++) { return $slotNames[$i] }
                 }
             }
         }
     }
+    # Prefer a slot that already contains a region/mesh. This preserves templates
+    # such as zhezhao + frame_0001 where the clipping end points to itself.
+    $orderedImageSlots=@($slotNames|Where-Object{$imageSlots.Contains($_) -and !$clippingSlots.Contains($_)})
+    foreach($start in $clipStarts){foreach($candidate in $orderedImageSlots){if([Array]::IndexOf($slotNames,$candidate) -gt $start){return $candidate}}}
+    foreach($pattern in @('frame','image','sequence','content','sprite')){
+        $named=@($orderedImageSlots|Where-Object{$_ -match $pattern}|Select-Object -First 1)
+        if($named.Count -gt 0){return $named[0]}
+    }
+    if($orderedImageSlots.Count -gt 0){return $orderedImageSlots[0]}
+    $plain=@($slotNames|Where-Object{!$clippingSlots.Contains($_)})
+    if($plain.Count -eq 1){return $plain[0]}
     return $null
 }
 
@@ -172,13 +192,18 @@ function Add-SpineFrameAnimation {
 
 function Copy-TemplateImages {
     param($Data, [string]$TemplatePath, [string]$DestinationImages)
-    if ([IO.Path]::GetExtension($TemplatePath).ToLowerInvariant() -eq '.json') { $base = Split-Path -Parent $TemplatePath }
-    else { $base = Split-Path -Parent $TemplatePath }
-    $imagesSetting = if ($Data.skeleton -and $Data.skeleton.images) { [string]$Data.skeleton.images } else { './images/' }
+    $base = Split-Path -Parent $TemplatePath
+    $imagesSetting = if ($Data.skeleton -and $null -ne $Data.skeleton.images) { [string]$Data.skeleton.images } else { '' }
     if ([IO.Path]::IsPathRooted($imagesSetting)) { $source = $imagesSetting }
+    elseif([string]::IsNullOrWhiteSpace($imagesSetting)){ $source = $base }
     else { $source = [IO.Path]::GetFullPath((Join-Path $base $imagesSetting)) }
     if (Test-Path -LiteralPath $source -PathType Container) {
-        Get-ChildItem -LiteralPath $source -Force | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $DestinationImages -Recurse -Force }
+        foreach($file in @(Get-ChildItem -LiteralPath $source -File -Recurse | Where-Object { $_.Extension.ToLowerInvariant() -in @('.png','.jpg','.jpeg','.bmp','.gif','.webp') })){
+            $relative=$file.FullName.Substring($source.TrimEnd('\').Length).TrimStart('\')
+            $target=Join-Path $DestinationImages $relative
+            [void](New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force)
+            Copy-Item -LiteralPath $file.FullName -Destination $target -Force
+        }
     }
 }
 

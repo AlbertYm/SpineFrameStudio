@@ -4,9 +4,23 @@ $Script:ToolDir=$PSScriptRoot
 $config=Get-Content -LiteralPath (Join-Path $JobDirectory 'config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $script:jobState=@{state='running';completed=0;total=@($config.videos).Count;phase='准备素材';current='';outputs=@();spineProjects=@();openSpine=$false;preview=$null;error=''}
 function Save-JobState {
-    $tmp=Join-Path $JobDirectory 'status.tmp'
-    [IO.File]::WriteAllText($tmp,($script:jobState|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
-    Move-Item -LiteralPath $tmp -Destination (Join-Path $JobDirectory 'status.json') -Force
+    $destination=Join-Path $JobDirectory 'status.json'
+    $json=$script:jobState|ConvertTo-Json -Depth 8
+    # The GUI polls this file frequently. Use a unique temporary file and retry the
+    # replace so a short Windows sharing race never aborts the whole media job.
+    for($attempt=1;$attempt -le 40;$attempt++){
+        $tmp=Join-Path $JobDirectory ('status.'+[guid]::NewGuid().ToString('N')+'.tmp')
+        try {
+            [IO.File]::WriteAllText($tmp,$json,[Text.UTF8Encoding]::new($false))
+            Move-Item -LiteralPath $tmp -Destination $destination -Force -ErrorAction Stop
+            return
+        } catch [IO.IOException] {
+            if($attempt -eq 40){throw}
+            Start-Sleep -Milliseconds 25
+        } finally {
+            if(Test-Path -LiteralPath $tmp){Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue}
+        }
+    }
 }
 try {
     $env:TEMP=Join-Path $JobDirectory 'temp'

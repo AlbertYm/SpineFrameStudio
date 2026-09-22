@@ -1,10 +1,10 @@
-# Spine Frame Studio
+﻿# Spine Frame Studio
 
-Windows 本地视频 / GIF 抽帧素材工作台，当前源码版本 **2026.9.22**。支持按张数或 FPS 抽帧、纯色背景抠图、透明 PNG、画布缩放、Spine 前缀命名、预览 GIF、描边，以及从新工程或带 Clipping/Mask 的模板生成 Spine 序列帧动画。
+Windows 本地视频 / GIF 抽帧素材工作台，当前源码版本 **2026.9.23**。支持按张数或 FPS 抽帧、纯色背景抠图、透明 PNG、画布缩放、Spine 前缀命名、预览 GIF、描边，以及从新工程或带 Clipping/Mask 的模板生成 Spine 序列帧动画。
 
 ## 下载与启动
 
-1. 当前公开便携包仍是 [2026.9.15 发布页](https://github.com/AlbertYm/SpineFrameStudio/releases/tag/v2026.9.15) 的 `SpineFrameStudio_2026.9.15.zip`。2026.9.22 已同步源码，但因第三方依赖材料尚未闭合，没有发布新的公开二进制附件。
+1. 打开 [2026.9.23 发布页](https://github.com/AlbertYm/SpineFrameStudio/releases/tag/v2026.9.23)，下载 `SpineFrameStudio_2026.9.23_no-ffmpeg.zip`。此公开包包含完整应用，但不包含 FFmpeg；请按包内 `FFMPEG_REQUIRED_先看这里.txt` 配置 FFmpeg。
 2. 完整解压到可写文件夹，不要在 ZIP 内直接运行。
 3. 双击发布包中的 EXE。全部同目录文件必须保留；不能只复制 EXE。
 4. 添加视频 / GIF，选择抽帧模式与输出目录，点击“开始导出”。第一次建议用短素材导出 4 张，检查透明度及尺寸。
@@ -14,7 +14,7 @@ Windows 本地视频 / GIF 抽帧素材工作台，当前源码版本 **2026.9.2
 ## 运行要求
 
 - Windows x64；Windows PowerShell 5.1 与 .NET Framework（Windows 自带组件）。
-- 便携包包含 FFmpeg；不需要 Python、Node、.NET SDK、管理员权限、网络或 AI 服务。
+- GitHub 2026.9.23 公开包不包含 FFmpeg；请把可信的 Windows x64 `ffmpeg.exe` 放到程序目录，或加入系统 PATH。不需要 Python、Node、.NET SDK、管理员权限或 AI 服务。
 - EXE 未签名。企业应用控制或 SmartScreen 可能阻止运行，应核实来源后按本机管理要求处理。
 - 另一台电脑、125% / 150% DPI 与跨屏缩放仍需目标机人工验收。
 
@@ -29,7 +29,7 @@ Windows 本地视频 / GIF 抽帧素材工作台，当前源码版本 **2026.9.2
 
 ## 从源码运行
 
-`src/` 是当前 2026.9.22 源码，版本依据为 `src/version.json`。从可信的 FFmpeg 发布渠道取得适用 Windows x64 的 `ffmpeg.exe`，放到 `src/`。然后双击 `src/打开抽帧工具.bat`。
+`src/` 是当前 2026.9.23 源码，版本依据为 `src/version.json`。从可信的 FFmpeg 发布渠道取得适用 Windows x64 的 `ffmpeg.exe`，放到 `src/`。然后双击 `src/打开抽帧工具.bat`。
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frames.ps1 -Gui
@@ -39,7 +39,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frame
 
 ## 验证与限制
 
-2026.9.22 开发机验收：普通抽帧回归 32 项通过；干净中文空格目录中的真实 EXE 完成 10 项 Spine GUI 检查。4 张 128×128 PNG 成功写入含 Clipping 的模板工程，往返后保留 `mask_slot, content_slot, mask_end` 顺序、Clipping 类型、4 个顶点、结束 Slot 和既有动画，并新增 4 个 attachment。用户实际复杂 Mask 工程、另一台电脑及 125% / 150% DPI 仍待人工验收。
+2026.9.23 开发机验收：状态文件被另一读取进程占用 700ms 时后台重试成功；普通抽帧回归 32 项通过；干净中文空格目录中的真实 EXE 完成 10 项 Spine GUI 检查。使用真实 `EmojiPumpkinKing_01.spine` 验证，自动选择 `frame_0001`，保留 `zhezhao, frame_0001` Slot 顺序、Clipping、已有 `Idle` 动画和 30 张模板图片，并新增 4 帧动画。用户实际更多复杂 Mask/Deform 工程、另一台电脑及 125% / 150% DPI 仍待人工验收。
 
 已知限制：首帧预览、纯色抠图、设置不跨启动保存、停止在文件边界生效、部分提示优先中文。系统临时目录会保存 `SpineWorkbench_*` 诊断文件。创建 `.spine` 需要目标电脑安装并激活 Spine 4.1.24；模板克隆以 Spine JSON 能表达的运行时结构为准，不保证编辑器视图状态等专属元数据。
 

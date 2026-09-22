@@ -1,8 +1,8 @@
 ﻿{
   "product": "Spine Frame Studio",
-  "version": "2026.9.22",
-  "fileVersion": "2026.9.22.0",
-  "executable": "SpineFrameStudio_2026.9.22.exe",
+  "version": "2026.9.23",
+  "fileVersion": "2026.9.23.0",
+  "executable": "SpineFrameStudio_2026.9.23.exe",
   "platform": "Windows x64",
   "theme": "Material Workbench"
 }

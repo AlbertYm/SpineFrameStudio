@@ -1,12 +1,12 @@
 # Spine Frame Studio
 
-Windows 本地视频 / GIF 抽帧素材工作台，当前发布版本 **2026.9.15**。支持按张数或 FPS 抽帧、纯色背景抠图、透明 PNG、画布缩放、Spine 前缀命名、预览 GIF 与描边。
+Windows 本地视频 / GIF 抽帧素材工作台，当前源码版本 **2026.9.22**。支持按张数或 FPS 抽帧、纯色背景抠图、透明 PNG、画布缩放、Spine 前缀命名、预览 GIF、描边，以及从新工程或带 Clipping/Mask 的模板生成 Spine 序列帧动画。
 
 ## 下载与启动
 
-1. 打开 [2026.9.15 发布页](https://github.com/AlbertYm/SpineFrameStudio/releases/tag/v2026.9.15)，下载 `SpineFrameStudio_2026.9.15.zip`。
+1. 当前公开便携包仍是 [2026.9.15 发布页](https://github.com/AlbertYm/SpineFrameStudio/releases/tag/v2026.9.15) 的 `SpineFrameStudio_2026.9.15.zip`。2026.9.22 已同步源码，但因第三方依赖材料尚未闭合，没有发布新的公开二进制附件。
 2. 完整解压到可写文件夹，不要在 ZIP 内直接运行。
-3. 双击 `SpineFrameStudio_2026.9.15.exe`。全部同目录文件必须保留；不能只复制 EXE。
+3. 双击发布包中的 EXE。全部同目录文件必须保留；不能只复制 EXE。
 4. 添加视频 / GIF，选择抽帧模式与输出目录，点击“开始导出”。第一次建议用短素材导出 4 张，检查透明度及尺寸。
 
 **GitHub 的 Source code ZIP 是源码，不是开箱即用便携包。** 详细操作见 [使用说明](docs/使用说明.md)，协作见 [上传与修改规则](CONTRIBUTING.md)。
@@ -24,11 +24,12 @@ Windows 本地视频 / GIF 抽帧素材工作台，当前发布版本 **2026.9.1
 - “更新预览”：只显示第一帧；修改参数后必须重新更新。
 - “透明与边缘”：纯色抠图、背景取色、柔边、去色溢等；这不是 AI 分割。
 - “导出与工具”：命名前缀、预览 GIF、描边、图片文件夹画布缩放。
+- “Spine 动画”：创建简单序列帧工程，或选择 `.spine` / Skeleton JSON 模板并保留骨骼、Slot、Skin、Clipping/Mask、Draw Order、Constraint 与已有动画；Mask 目标 Slot 可填写，也可从第一个 Clipping 范围自动识别。
 - 批量停止会等待当前文件完成；失败时查看展开的日志。原始素材不覆盖，结果写入独立目录。
 
 ## 从源码运行
 
-`src/` 是 2026.9.15 发布包中对应源码，版本依据为 `src/version.json`。从可信的 FFmpeg 发布渠道取得适用 Windows x64 的 `ffmpeg.exe`，放到 `src/`，或使用上述完整发布包内相同文件。然后双击 `src/打开抽帧工具.bat`。
+`src/` 是当前 2026.9.22 源码，版本依据为 `src/version.json`。从可信的 FFmpeg 发布渠道取得适用 Windows x64 的 `ffmpeg.exe`，放到 `src/`。然后双击 `src/打开抽帧工具.bat`。
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frames.ps1 -Gui
@@ -38,9 +39,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File .\src\extract_frame
 
 ## 验证与限制
 
-9 月 15 日历史验收记录：完整 ZIP 解压哈希、EXE 主窗口启动、33 项 GUI 检查、视频 / GIF 各 4 张 PNG、128×128 画布、预览 GIF、停止和失败恢复、174 字符中文空格路径通过。这些是当日开发机记录，本次公开上传未重跑完整 GUI 矩阵。
+2026.9.22 开发机验收：普通抽帧回归 32 项通过；干净中文空格目录中的真实 EXE 完成 10 项 Spine GUI 检查。4 张 128×128 PNG 成功写入含 Clipping 的模板工程，往返后保留 `mask_slot, content_slot, mask_end` 顺序、Clipping 类型、4 个顶点、结束 Slot 和既有动画，并新增 4 个 attachment。用户实际复杂 Mask 工程、另一台电脑及 125% / 150% DPI 仍待人工验收。
 
-本次上传会核对原 ZIP 与载荷哈希，不修改程序。已知限制：首帧预览、纯色抠图、设置不跨启动保存、停止在文件边界生效、部分提示优先中文。系统临时目录会保存 `SpineWorkbench_*` 诊断文件。
+已知限制：首帧预览、纯色抠图、设置不跨启动保存、停止在文件边界生效、部分提示优先中文。系统临时目录会保存 `SpineWorkbench_*` 诊断文件。创建 `.spine` 需要目标电脑安装并激活 Spine 4.1.24；模板克隆以 Spine JSON 能表达的运行时结构为准，不保证编辑器视图状态等专属元数据。
 
 更新时解压到新目录，保留旧版与素材；回退直接运行保留的旧目录。退出程序后可删除程序目录完成卸载，删除前确认没有将自己的输出保存其中。
 

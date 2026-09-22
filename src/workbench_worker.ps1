@@ -2,7 +2,7 @@
 $ErrorActionPreference='Stop'
 $Script:ToolDir=$PSScriptRoot
 $config=Get-Content -LiteralPath (Join-Path $JobDirectory 'config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$script:jobState=@{state='running';completed=0;total=@($config.videos).Count;phase='准备素材';current='';outputs=@();preview=$null;error=''}
+$script:jobState=@{state='running';completed=0;total=@($config.videos).Count;phase='准备素材';current='';outputs=@();spineProjects=@();openSpine=$false;preview=$null;error=''}
 function Save-JobState {
     $tmp=Join-Path $JobDirectory 'status.tmp'
     [IO.File]::WriteAllText($tmp,($script:jobState|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
@@ -12,6 +12,7 @@ try {
     $env:TEMP=Join-Path $JobDirectory 'temp'
     [void](New-Item -ItemType Directory -Path $env:TEMP -Force)
     . (Join-Path $Script:ToolDir 'extract_frames_core.ps1')
+    . (Join-Path $Script:ToolDir 'spine_project.ps1')
     function Write-ToolLog {
         param([object]$LogBox,[string]$Message)
         [IO.File]::AppendAllText((Join-Path $JobDirectory 'activity.log'), ('['+(Get-Date -Format 'HH:mm:ss')+'] '+$Message+[Environment]::NewLine),[Text.UTF8Encoding]::new($false))
@@ -22,6 +23,7 @@ try {
             'outline' {'处理描边';break}
             'resiz|Resize' {'调整画布';break}
             'GIF' {'生成 GIF';break}
+            'Spine' {'创建 Spine 工程';break}
             default {$script:jobState.phase}
         }
         Save-JobState
@@ -66,10 +68,20 @@ try {
             } else {
                 $folder=Convert-VideoToFrames -VideoPath $video @arguments
                 $script:jobState.outputs+=@($folder)
+                if($config.spine -and $config.spine.Enabled){
+                    $script:jobState.phase='创建 Spine 工程';Save-JobState
+                    Write-ToolLog -LogBox $null -Message "Spine: 正在为 $([IO.Path]::GetFileName($video)) 创建动画工程。"
+                    $animationName=[string]$config.spine.AnimationName
+                    if(@($config.videos).Count -gt 1){$animationName+='_'+([IO.Path]::GetFileNameWithoutExtension($video) -replace '[\\/:*?"<>|]','_')}
+                    $spineResult=New-SpineAnimationProject -FramesFolder $folder -OutputRoot ([string]$config.arguments.Root) -AnimationName $animationName -Fps ([double]$config.spine.Fps) -Loop ([bool]$config.spine.Loop) -TemplatePath ([string]$config.spine.TemplatePath) -TargetSlot ([string]$config.spine.TargetSlot) -SpineVersion ([string]$config.spine.Version)
+                    if($spineResult.Project){$script:jobState.spineProjects+=@($spineResult.Project)}
+                    Write-ToolLog -LogBox $null -Message "Spine: 工程创建完成：$($spineResult.Folder)"
+                }
             }
             $script:jobState.completed++;Save-JobState
         }
     }
+    if($config.spine){$script:jobState.openSpine=[bool]$config.spine.OpenAfter}
     if($script:jobState.state -eq 'running'){$script:jobState.state='done'}
 } catch {$script:jobState.state='failed';$script:jobState.error=$_.Exception.Message}
 finally {Save-JobState}
